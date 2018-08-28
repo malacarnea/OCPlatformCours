@@ -55,4 +55,42 @@ class AdvertRepository extends \Doctrine\ORM\EntityRepository {
 //            ->setparameter("year", new \Datetime(date('Y')));
     }
 
+    public function getAdvertWithApplications() {
+        $qb = $this
+                ->createQueryBuilder('a')
+                ->leftJoin('a.applications', 'app', 'WITH', 'YEAR(app.date) > 2013')
+                ->addSelect('app')
+        ;
+
+        return $qb
+                        ->getQuery()
+                        ->getResult()
+        ;
+    }
+
+    public function getAdvertWithCategories(array $categoryNames) {
+//        $qb=$this->createQueryBuilder('a')
+//                ->leftJoin("a.categories", 'cat')
+//                ->where("cat.name IN (:catName)")
+//                ->setParameter("catName", $categoryNames);
+//        return $qb->getQuery()->getResult();
+        
+        $qb = $this->createQueryBuilder('a');
+
+        // On fait une jointure avec l'entité Category avec pour alias « c »
+        $qb
+                ->innerJoin('a.categories', 'c')
+                ->addSelect('c')
+        ;
+
+        // Puis on filtre sur le nom des catégories à l'aide d'un IN
+        $qb->where($qb->expr()->in('c.name', $categoryNames));
+        // La syntaxe du IN et d'autres expressions se trouve dans la documentation Doctrine
+        // Enfin, on retourne le résultat
+        return $qb
+                        ->getQuery()
+                        ->getResult()
+        ;
+    }
+
 }

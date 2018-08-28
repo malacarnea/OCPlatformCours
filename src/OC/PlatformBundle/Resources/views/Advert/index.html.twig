@@ -23,5 +23,19 @@
             <li>Pas (encore !) d'annonces</li>
             {% endfor %}
     </ul>
+    
+     <h2>Liste des 3 dernières candidatures</h2>
+
+    <ul>
+        {% for application in listApplications %}
+            <li>
+              {{ application.content }}
+                <i>par {{ application.author }},
+                    le {{ application.date|date('d/m/Y') }}, annonce n°{{ application.advert.id }}</i>
+            </li>
+        {% else %}
+            <li>Pas (encore !) de candidature</li>
+            {% endfor %}
+    </ul>
 
 {% endblock %}

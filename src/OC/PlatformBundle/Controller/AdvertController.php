@@ -38,9 +38,14 @@ class AdvertController extends Controller {
         $manager = $this->getDoctrine()->getManager();
         //utiliser les repository pour recuperer les entites dans la bd (raccourci NomBundle:NomEntite)
         $advertRepository = $manager->getRepository("OCPlatformBundle:Advert");
-        $listAdverts=$advertRepository->myFindAll();
+        $categories=array("Développement web", "Intégrateur");
+        $listAdverts=$advertRepository->getAdvertWithCategories($categories);
+        
+        $appRepo=$manager->getRepository("OCPlatformBundle:Application");
+        $listApplications=$appRepo->getApplicationsWithAdvert(3);
+//        $listAdverts=$advertRepository->getAdvertWithApplications();
 //        $listAdverts=$advertRepository->findByAuthorAndDate("Alicia", "2019");
-        return $this->render('OCPlatformBundle:Advert:index.html.twig', array("listAdverts" => $listAdverts));
+        return $this->render('OCPlatformBundle:Advert:index.html.twig', array("listAdverts" => $listAdverts, "listApplications"=>$listApplications));
     }
 
     public function viewAction($id) {
@@ -142,23 +147,18 @@ class AdvertController extends Controller {
         // On récupère l'annonce $id
         $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
 
+        
         if (null === $advert) {
             throw new NotFoundHttpException("L'annonce d'id " . $id . " n'existe pas.");
         }
-
-        // La méthode findAll retourne toutes les catégories de la base de données
-        $listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
-
-        // On boucle sur les catégories pour les lier à l'annonce
-        foreach ($listCategories as $category) {
-            $advert->addCategory($category);
-        }
+        $advert->setTitle("Changement de titre");
+        $em->persist($advert);
+        
 
         // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
         // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
         // Étape 2 : On déclenche l'enregistrement
         $em->flush();
-
         return $this->render('OCPlatformBundle:Advert:edit.html.twig', array("advert" => $advert));
     }
 

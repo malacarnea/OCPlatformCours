@@ -13,39 +13,21 @@ use OC\PlatformBundle\Entity\AdvertSkill;
 class AdvertController extends Controller {
 
     public function indexAction() {
-        // Notre liste d'annonce en dur
-//        $listAdverts = array(
-//            array(
-//                'title' => 'Recherche développpeur Symfony',
-//                'id' => 1,
-//                'author' => 'Alexandre',
-//                'content' => 'Nous recherchons un développeur Symfony débutant sur Lyon. Blabla…',
-//                'date' => new \Datetime()),
-//            array(
-//                'title' => 'Mission de webmaster',
-//                'id' => 2,
-//                'author' => 'Hugo',
-//                'content' => 'Nous recherchons un webmaster capable de maintenir notre site internet. Blabla…',
-//                'date' => new \Datetime()),
-//            array(
-//                'title' => 'Offre de stage webdesigner',
-//                'id' => 3,
-//                'author' => 'Mathieu',
-//                'content' => 'Nous proposons un poste pour webdesigner. Blabla…',
-//                'date' => new \Datetime())
-//        );
         //recupere l'entityManager par defaut
         $manager = $this->getDoctrine()->getManager();
         //utiliser les repository pour recuperer les entites dans la bd (raccourci NomBundle:NomEntite)
         $advertRepository = $manager->getRepository("OCPlatformBundle:Advert");
-        $categories=array("Développement web", "Intégrateur");
-        $listAdverts=$advertRepository->getAdvertWithCategories($categories);
-        
-        $appRepo=$manager->getRepository("OCPlatformBundle:Application");
-        $listApplications=$appRepo->getApplicationsWithAdvert(3);
-//        $listAdverts=$advertRepository->getAdvertWithApplications();
+        //recuperer toutes les annonces
+        //functions de recuperation des annonces
+        $listAdverts = $advertRepository->myFindAll();
+//        $categories=array("Développement web", "Intégrateur");
+//        $listAdverts=$advertRepository->getAdvertWithCategories($categories);
+//        $appRepo=$manager->getRepository("OCPlatformBundle:Application");
 //        $listAdverts=$advertRepository->findByAuthorAndDate("Alicia", "2019");
-        return $this->render('OCPlatformBundle:Advert:index.html.twig', array("listAdverts" => $listAdverts, "listApplications"=>$listApplications));
+        //recuperer les annonces avec leurs candidatures
+//        $listAdverts=$advertRepository->getAdvertWithApplications();
+
+        return $this->render('OCPlatformBundle:Advert:index.html.twig', array("listAdverts" => $listAdverts));
     }
 
     public function viewAction($id) {
@@ -71,17 +53,17 @@ class AdvertController extends Controller {
     public function addAction(Request $request) {
         //créer l'advert
         $advert = new Advert;
-        $advert->setTitle('Graphiste');
-        $advert->setAuthor('Alicia');
-        $advert->setContent("Recherche un Graphiste pour un projet de jeu vidéo en temps réel.");
+        $advert->setTitle('Developper Javascript');
+        $advert->setAuthor('Purpaly');
+        $advert->setContent("Recherche un développeur Javascript connaissant le framework impact.js pour concevoir un jeu de Baseball coté front-end.");
 
         $appli = new Application;
         $appli->setAuthor('John TITOR');
         $appli->setContent('Professeur en Physique Quantique, je passe mon temps libre à créer des maquettes sous Photoshop.');
 
         $appli2 = new Application;
-        $appli2->setAuthor('Creatix');
-        $appli2->setContent('The Gimp, il n\'y a que ça de vrai !');
+        $appli2->setAuthor('Hiyoin Kyoma');
+        $appli2->setContent('Créateur de la machine à remonter le temps, j\'ai fait un jeu de plateform avec impact.js.');
 
         $appli->setAdvert($advert);
         $appli2->setAdvert($advert);
@@ -147,13 +129,13 @@ class AdvertController extends Controller {
         // On récupère l'annonce $id
         $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
 
-        
+
         if (null === $advert) {
             throw new NotFoundHttpException("L'annonce d'id " . $id . " n'existe pas.");
         }
         $advert->setTitle("Changement de titre");
         $em->persist($advert);
-        
+
 
         // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
         // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
@@ -199,6 +181,18 @@ class AdvertController extends Controller {
                     // les variables nécessaires au template !
                     'listAdverts' => $listAdverts
         ));
+    }
+
+    public function testAction() {
+        $advert = new Advert();
+        $advert->setTitle("Recherche développeur !");
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($advert);
+        $em->flush(); // C'est à ce moment qu'est généré le slug
+
+        return new Response('Slug généré : ' . $advert->getSlug());
+        // Affiche « Slug généré : recherche-developpeur »
     }
 
 }

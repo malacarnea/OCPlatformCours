@@ -4,6 +4,7 @@ namespace OC\PlatformBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * Advert
  *
@@ -54,34 +55,39 @@ class Advert {
      * @ORM\Column(name="published", type="boolean")
      */
     private $published = true;
-    
+
     /**
      * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"}) 
      */
     private $image;
-   
+
     /**
      * @ORM\ManyToMany(targetEntity="OC\PlatformBundle\Entity\Category", cascade={"persist"})
      * @ORM\JoinTable(name="oc_advert_category")
      */
     private $categories;
-    
+
     /**
      * @ORM\OneToMany(targetEntity="OC\PlatformBundle\Entity\Application", mappedBy="advert")
      */
     private $applications;
-    
+
     /**
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     private $updatedAt;
-    
+
     /**
      * @ORM\Column(name="nb_applications", type="integer")
      */
     private $nbApplications = 0;
-    
-    
+
+    /**
+     * @Gedmo\Slug(fields={"title"})
+     * @ORM\Column(name="slug", type="string", length=255, unique=true)
+     */
+    private $slug;
+
     //constructeur
     public function __construct() {
         $this->date = new \DateTime();
@@ -185,7 +191,6 @@ class Advert {
         return $this->content;
     }
 
-
     /**
      * Set published
      *
@@ -193,8 +198,7 @@ class Advert {
      *
      * @return Advert
      */
-    public function setPublished($published)
-    {
+    public function setPublished($published) {
         $this->published = $published;
 
         return $this;
@@ -205,8 +209,7 @@ class Advert {
      *
      * @return boolean
      */
-    public function getPublished()
-    {
+    public function getPublished() {
         return $this->published;
     }
 
@@ -217,8 +220,7 @@ class Advert {
      *
      * @return Advert
      */
-    public function setImage(\OC\PlatformBundle\Entity\Image $image = null)
-    {
+    public function setImage(\OC\PlatformBundle\Entity\Image $image = null) {
         $this->image = $image;
 
         return $this;
@@ -229,8 +231,7 @@ class Advert {
      *
      * @return \OC\PlatformBundle\Entity\Image
      */
-    public function getImage()
-    {
+    public function getImage() {
         return $this->image;
     }
 
@@ -241,8 +242,7 @@ class Advert {
      *
      * @return Advert
      */
-    public function addCategory(\OC\PlatformBundle\Entity\Category $category)
-    {
+    public function addCategory(\OC\PlatformBundle\Entity\Category $category) {
         $this->categories[] = $category;
 
         return $this;
@@ -253,8 +253,7 @@ class Advert {
      *
      * @param \OC\PlatformBundle\Entity\Category $category
      */
-    public function removeCategory(\OC\PlatformBundle\Entity\Category $category)
-    {
+    public function removeCategory(\OC\PlatformBundle\Entity\Category $category) {
         $this->categories->removeElement($category);
     }
 
@@ -263,8 +262,7 @@ class Advert {
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getCategories()
-    {
+    public function getCategories() {
         return $this->categories;
     }
 
@@ -275,8 +273,7 @@ class Advert {
      *
      * @return Advert
      */
-    public function addApplication(\OC\PlatformBundle\Entity\Application $application)
-    {
+    public function addApplication(\OC\PlatformBundle\Entity\Application $application) {
         $this->applications[] = $application;
         $application->setAdvert($this);
         return $this;
@@ -287,8 +284,7 @@ class Advert {
      *
      * @param \OC\PlatformBundle\Entity\Application $application
      */
-    public function removeApplication(\OC\PlatformBundle\Entity\Application $application)
-    {
+    public function removeApplication(\OC\PlatformBundle\Entity\Application $application) {
         $this->applications->removeElement($application);
         $application->setAdvert(null);
     }
@@ -298,8 +294,7 @@ class Advert {
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getApplications()
-    {
+    public function getApplications() {
         return $this->applications;
     }
 
@@ -310,8 +305,7 @@ class Advert {
      *
      * @return Advert
      */
-    public function setUpdatedAt($updatedAt)
-    {
+    public function setUpdatedAt($updatedAt) {
         $this->updatedAt = $updatedAt;
 
         return $this;
@@ -322,12 +316,9 @@ class Advert {
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
-    {
+    public function getUpdatedAt() {
         return $this->updatedAt;
     }
-    
- 
 
     /**
      * Set nbApplications
@@ -336,8 +327,7 @@ class Advert {
      *
      * @return Advert
      */
-    public function setNbApplications($nbApplications)
-    {
+    public function setNbApplications($nbApplications) {
         $this->nbApplications = $nbApplications;
 
         return $this;
@@ -348,23 +338,47 @@ class Advert {
      *
      * @return integer
      */
-    public function getNbApplications()
-    {
+    public function getNbApplications() {
         return $this->nbApplications;
     }
-    
+
     /**
      * @ORM\PreUpdate
      */
-    public function updateDate(){
+    public function updateDate() {
         $this->setUpdatedAt(new \Datetime());
     }
-    
-    public function increaseApplications(){
+
+    public function increaseApplications() {
         $this->nbApplications++;
     }
-    
-    public function decreaseApplications(){
+
+    public function decreaseApplications() {
         $this->nbApplications--;
+    }
+
+
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     *
+     * @return Advert
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get slug
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
     }
 }

@@ -7,3 +7,4 @@
 !var/sessions/.gitkeep
 /vendor/
 /web/bundles/
+/nbproject/private/

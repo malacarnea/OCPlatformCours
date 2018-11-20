@@ -1,34 +1,43 @@
+# src/OC/PlatformBundle/Resources/config/routing.yml
+
 oc_platform_home:
-    path:      /
-    defaults: { _controller: OCPlatformBundle:Advert:index }
+    path:      /{page}
+    defaults:
+        _controller: OCPlatformBundle:Advert:index
+        page:        1
+    requirements:
+        page: \d*
     
 oc_platform_view:
     path:      /advert/{id}
-    defaults: { _controller: OCPlatformBundle:Advert:view }
+    defaults:
+        _controller: OCPlatformBundle:Advert:view
     requirements:
-        id:    \d+
-        
-        
+        id: \d+
+
 oc_platform_add:
     path:      /add
-    defaults: 
+    defaults:
         _controller: OCPlatformBundle:Advert:add
 
 oc_platform_edit:
     path:      /edit/{id}
-    defaults: 
+    defaults:
         _controller: OCPlatformBundle:Advert:edit
     requirements:
         id: \d+
-        
+
 oc_platform_delete:
     path:      /delete/{id}
-    defaults: 
+    defaults:
         _controller: OCPlatformBundle:Advert:delete
     requirements:
         id: \d+
-        
-oc_platform_test:
-    path:       /test
+
+oc_platform_purger:
+    path:     /purge/{days}
     defaults:
-        _controller: OCPlatformBundle:Advert:test
+        _controller: OCPlatformBundle:Advert:purge
+        days: 1
+    requirements:
+        days: \d+

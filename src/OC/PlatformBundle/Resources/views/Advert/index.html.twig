@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block ocplatform_body %}
-
+   
     <h2>Liste des annonces</h2>
 
     <ul>
@@ -17,14 +17,21 @@
                     {{ advert.title }}
                 </a>
                 par {{ advert.author }},
-                le {{ advert.date|date('d/m/Y') }}.
-                Nombre de candidatures : {{ advert.nbApplications }}
+                le {{ advert.date|date('d/m/Y') }}
+                ({{ advert.nbApplications }})
             </li>
         {% else %}
             <li>Pas (encore !) d'annonces</li>
             {% endfor %}
     </ul>
-    
-    
+
+    <ul class="pagination">
+        {# On utilise la fonction range(a, b) qui crée un tableau de valeurs entre a et b #}
+        {% for p in range(1, nbPages) %}
+            <li{% if p == page %} class="active"{% endif %}>
+                <a href="{{ path('oc_platform_home', {'page': p}) }}">{{ p }}</a>
+            </li>
+        {% endfor %}
+    </ul>
 
 {% endblock %}

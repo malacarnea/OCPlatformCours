@@ -1,8 +1,19 @@
-{%extends "OCCoreBundle::layout.html.twig"%}
+{# src/OC/PlatformBundle/Resources/views/layout.html.twig #}
 
-{% block title %}Annonces - {{parent()}}{% endblock %}
+{% extends "OCCoreBundle::layout.html.twig" %}
+
+{% block title %}
+    Annonces - {{ parent() }}
+{% endblock %}
+
 {% block body %}
-  
+    {# On affiche tous les messages flash dont le nom est « info » #}
+    {% for message in app.session.flashbag.get('info') %}
+        <div class="alert alert-info alert-dismissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            Message flash : {{ message }}
+        </div>
+    {% endfor %}
     {# On définit un sous-titre commun à toutes les pages du bundle, par exemple #}
     <h1>Annonces</h1>
 

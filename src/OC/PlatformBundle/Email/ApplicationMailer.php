@@ -1,10 +1,12 @@
 <?php
+// src/OC/PlatformBundle/Email/ApplicationMailer.php
+
 namespace OC\PlatformBundle\Email;
 
 use OC\PlatformBundle\Entity\Application;
 
-class ApplicationMailer {
-
+class ApplicationMailer
+{
   /**
    * @var \Swift_Mailer
    */
@@ -29,5 +31,4 @@ class ApplicationMailer {
 
     $this->mailer->send($message);
   }
-    
 }
